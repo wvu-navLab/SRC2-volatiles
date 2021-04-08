@@ -16,11 +16,20 @@
 class VolatileMapper
 {
 public:
-  VolatileMapper(ros::NodeHandle &);
+  VolatileMapper(ros::NodeHandle &, int num_scouts);
 
 private:
   ros::NodeHandle & nh_;
   volatile_map::VolatileMap VolatileMap_;
+
+  std::vector<ros::Subscriber> volSubs_;
+
+  void volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event);
+
+
+  ros::Publisher volMapPub_;
+
+
 
 };
 
