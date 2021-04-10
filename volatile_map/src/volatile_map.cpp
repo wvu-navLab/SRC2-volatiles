@@ -68,7 +68,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
       VolatileMap_.vol.push_back(vol);
 
       volMapPub_.publish(VolatileMap_);
-      // volOccGridPub_.publish(VolatileOccupancyGrid_);
+    
     }
     // int data[200][200];
     // // std::iota(std::begin(data), std::end(data), 0); //0 is the starting number
