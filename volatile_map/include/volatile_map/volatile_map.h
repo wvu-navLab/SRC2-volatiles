@@ -12,6 +12,8 @@
 #include <tf2/transform_datatypes.h>
 #include <volatile_map/Volatile.h>
 #include <volatile_map/VolatileMap.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <numeric>
 
 class VolatileMapper
 {
@@ -21,13 +23,17 @@ public:
 private:
   ros::NodeHandle & nh_;
   volatile_map::VolatileMap VolatileMap_;
+  nav_msgs::OccupancyGrid VolatileOccupancyGrid_;
 
   std::vector<ros::Subscriber> volSubs_;
 
   void volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event);
 
+  // void volatileOccupancyGridCallBack_(const nav_msgs::OccupancyGrid::ConstPtr& msg);
 
   ros::Publisher volMapPub_;
+
+  ros::Publisher volOccGridPub_;
 
 
 

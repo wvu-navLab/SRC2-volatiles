@@ -14,6 +14,7 @@ for (int i=0; i<num_scouts; i++) {
 
 
   volMapPub_ = nh_.advertise<volatile_map::VolatileMap>("/volatile_map", 1);
+  volOccGridPub_=nh_.advertise<nav_msgs::OccupancyGrid>("/vol_occupancy_grid",1);
 }
 
 
@@ -67,15 +68,49 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
       VolatileMap_.vol.push_back(vol);
 
       volMapPub_.publish(VolatileMap_);
+      // volOccGridPub_.publish(VolatileOccupancyGrid_);
     }
+    // int data[200][200];
+    // // std::iota(std::begin(data), std::end(data), 0); //0 is the starting number
+    // std::fill(*data, *data +200*200, -1);
+    // std::vector<int> grid(200*200);
+    // std::iota(std::begin(grid), std::end(grid), 0); //0 is the starting number
+    // int grid[200][200];
+    // std::fill(*grid, *grid +200*200, -1);
+
+    nav_msgs::OccupancyGrid map_msg;
+    char* data = new char[200*200];
+    for (int i=0; i<200*200; i++)
+    data[i] =-1;
+
+    map_msg.header.frame_id="small_scout_" + std::to_string(std::atoi(&robot_number)) + "_odom";
+    map_msg.info.resolution = 1;
+    map_msg.info.width = 200;
+    map_msg.info.height = 200;
+
+    map_msg.data = std::vector<int8_t>(data, data + 200*200);
+    map_msg.info.origin.position.x = - 200/ 2 * 1;
+    map_msg.info.origin.position.y = - 200/ 2 * 1;
+
+    // map_msg.info.origin.position.x = - width/ 2 * resolution
+    // map_msg.info.origin.position.y = - height/ 2 * resolution
+
     // TODO  handle saving case where didnt see a volatile
     //  ROS occupancy grid
-
+    // VolatileOccupancyGrid_.map_msg.push_back(map_msg);
+    volOccGridPub_.publish(map_msg);
 
 
 }
 
-
+// void VolatileMapper::volatileOccupancyGridCallBack_(const nav_msgs::OccupancyGrid::ConstPtr& msg){
+//
+//   nav_msgs::OccupancyGrid map_msg;
+//   map_msg.header.frame_id =
+//
+// ROS_INFO(" occupancy Grid");
+//
+// }
 
 ///////////////////////////////////////////////////////////////////
 
