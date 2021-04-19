@@ -46,6 +46,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   vol.collected = false;
   vol.failed_to_collect = false;
   vol.attempted = false;
+  vol.honed = false;
   vol.scout_id = std::atoi(&robot_number);
 
 
@@ -113,11 +114,17 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
           }
           // continuous tracking, but now we are farther away than we were
           else{
+
+
             // publish flag to tell state machine to STOP
+            // only if we are aleady trying this honeing manuever
             // dont keep this volatile and dont publish map
-            std_msgs::Bool stop_msg;
-            stop.data= true;
-            stopScoutPub_[vol.scout_id].publish(stop);
+            if(!VolatileMap_[index].honed){
+              VolatileMap_[index].honed=true;
+              std_msgs::Bool stop_msg;
+              stop.data= true;
+              stopScoutPub_[vol.scout_id].publish(stop);
+          }
           }
 
 

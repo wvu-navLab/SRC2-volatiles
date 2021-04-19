@@ -7,3 +7,4 @@ bool smoothed
 bool attempted
 bool failed_to_collect
 bool collected
+bool honed
