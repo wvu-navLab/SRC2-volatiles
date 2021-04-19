@@ -4,11 +4,17 @@
 
 VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts) : nh_(nh) {
 
-for (int i=0; i<num_scouts; i++) {
-   std::string topic;
-   topic = "/small_scout_" + std::to_string(i+1) + "/volatile_sensor";
-   volSubs_.push_back(nh_.subscribe(topic, 1, &VolatileMapper::volatileSensorCallBack_, this));
+  timeOut_=0.5;
+  distanceThresh_=10;
 
+for (int i=0; i<num_scouts; i++) {
+   std::string topic_sub;
+   std::string topic_pub;
+   topic_sub = "/small_scout_" + std::to_string(i+1) + "/volatile_sensor";
+   topic_pub = "/small_scout_" + std::to_string(i+1) + "/volatile_map/stop";
+   volSubs_.push_back(nh_.subscribe(topic_sub, 1, &VolatileMapper::volatileSensorCallBack_, this));
+   lastVolRecordedPerID_.push_back(ros::Time::now());
+   stopScoutPub_.push_back(nh_.advertise<std_msgs::Bool>(topic_pub,1);
 
   }
 
@@ -20,12 +26,17 @@ for (int i=0; i<num_scouts; i++) {
 
 void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event){
 
+
   const ros::M_string& header = event.getConnectionHeader();
   std::string topic = header.at("topic");
   char robot_number = topic.c_str()[13];
   std::cout << "debug " << robot_number << std::endl;
 
   const srcp2_msgs::VolSensorMsg::ConstPtr& msg = event.getMessage();
+  //if this is not a valid volatile (i.e., ==-1), just perform quick return
+  if( msg->distance_to == -1 ){
+    return;
+  }
 
   volatile_map::Volatile vol;
 
@@ -33,6 +44,8 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   vol.distance_to = msg->distance_to;
   vol.smoothed = false;
   vol.collected = false;
+  vol.failed_to_collect = false;
+  vol.attempted = false;
   vol.scout_id = std::atoi(&robot_number);
 
 
@@ -61,13 +74,71 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
       ROS_ERROR("%s", ex.what());
     }
 
+    bool haveSeenThisVol= false;
+    int index = -1;
+    for(std::vector<Volatile>::iterator it = VolatileMap_.begin(); it != VolatileMap_.end(); ++it) {
+      double dx = vol.position.x - it->position.x;
+      double dy = vol.position.y - it->position.y;
+      double distance = pow(dx*dx + dy*dy), 0.5);
+      // if we are close to where we saw this volatile and it is same type, assume it is the same one
+      // TODO TEST THESE THRESH
+      if( distance < distanceThresh_ && (vol.type == it-> type) ){
+        haveSeenThisVol = true;
+        index = it-VolatileMap_.begin();
 
-    if(vol.distance_to > 0.0){
+      }
 
+    }
+
+    // if we have never seen this volatile, we push back and publish the map
+    if(!haveSeenThisVol){
       VolatileMap_.vol.push_back(vol);
-
       volMapPub_.publish(VolatileMap_);
     }
+    else{
+      // we have seen this volatile before.
+      // was it recently?
+      ros::Duration deltaT = ros::Time::now() - lastVolRecordedPerID_[vol.scout_id];
+      // TODO TEST THIS TIMEOUT THRESH
+      if(deltaT < timeOut_){
+
+          // are we closer now?
+          if(vol.distance_to < VolatileMap_[index].distance_to){
+            // if this is a continuous track and we are still getting closer,
+            // replace the volatile and publish map again
+            VolatileMap_[index] = vol;
+            // republish map with updated location
+            volMapPub_.publish(VolatileMap_);
+
+          }
+          // continuous tracking, but now we are farther away than we were
+          else{
+            // publish flag to tell state machine to STOP
+            // dont keep this volatile and dont publish map
+            std_msgs::Bool stop_msg;
+            stop.data= true;
+            stopScoutPub_[vol.scout_id].publish(stop);
+          }
+
+
+      }
+      else{
+        // this means we are not continuously tracking this vol, but we have seen it before
+        // TODO we need to have some logic to determine what is to do, based on occupancy map
+        // for now, only replace if it has been marked as a failed_to_collect volatile
+          if(VolatileMap_[index].failed_to_collect){
+            VolatileMap_[index] = vol;
+            volMapPub_.publish(VolatileMap_);
+          }
+
+       }
+
+
+
+    }
+
+
+
     // TODO  handle saving case where didnt see a volatile
     //  ROS occupancy grid
 

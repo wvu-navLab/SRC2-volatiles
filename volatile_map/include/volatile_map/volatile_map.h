@@ -23,11 +23,19 @@ private:
   volatile_map::VolatileMap VolatileMap_;
 
   std::vector<ros::Subscriber> volSubs_;
-
+  std::vector<ros::Publisher> stopScoutPub_;
+  
   void volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event);
 
 
   ros::Publisher volMapPub_;
+
+  // used for timers to determine time since last have seen a vol
+  std::vector<ros::Time> lastVolRecordedPerID_;
+  double timeOut_;
+  double distanceThresh_;
+
+
 
 
 
