@@ -10,6 +10,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
 #include <tf2/transform_datatypes.h>
+#include <std_msgs/Bool.h>
 #include <volatile_map/Volatile.h>
 #include <volatile_map/VolatileMap.h>
 
@@ -24,7 +25,7 @@ private:
 
   std::vector<ros::Subscriber> volSubs_;
   std::vector<ros::Publisher> stopScoutPub_;
-  
+
   void volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event);
 
 
