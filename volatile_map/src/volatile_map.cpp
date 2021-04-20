@@ -119,7 +119,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
 
       std_msgs::Int8 stop_msg;
       stop_msg.data= 1;
-      stopScoutPub_[vol.scout_id].publish(stop_msg);
+      stopScoutPub_[vol.scout_id-1].publish(stop_msg);
     }
     // we have seen this volatile before.
     // was it recently?
@@ -148,7 +148,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
           VolatileMap_.vol[index].honed=true;
           std_msgs::Int8 stop_msg;
           stop_msg.data= 2;
-          stopScoutPub_[vol.scout_id].publish(stop_msg);
+          stopScoutPub_[vol.scout_id-1].publish(stop_msg);
         }
       }
     }
