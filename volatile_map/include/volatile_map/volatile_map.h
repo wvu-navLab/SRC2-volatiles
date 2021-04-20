@@ -10,7 +10,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
 #include <tf2/transform_datatypes.h>
-#include <std_msgs/Bool.h>
+#include <std_msgs/Int8.h>
 #include <volatile_map/Volatile.h>
 #include <volatile_map/VolatileMap.h>
 

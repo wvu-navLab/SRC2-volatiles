@@ -2,13 +2,13 @@
 
 
 
-VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts) 
-  : nh_(nh) 
+VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
+  : nh_(nh)
 {
   timeOut_=0.5;
   distanceThresh_=10;
 
-  for (int i=0; i<num_scouts; i++) 
+  for (int i=0; i<num_scouts; i++)
   {
     std::string topic_sub;
     std::string topic_pub;
@@ -16,7 +16,7 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
     topic_pub = "/small_scout_" + std::to_string(i+1) + "/volatile_map/stop";
     volSubs_.push_back(nh_.subscribe(topic_sub, 1, &VolatileMapper::volatileSensorCallBack_, this));
     lastVolRecordedPerID_.push_back(ros::Time::now());
-    stopScoutPub_.push_back(nh_.advertise<std_msgs::Bool>(topic_pub,1));
+    stopScoutPub_.push_back(nh_.advertise<std_msgs::Int8>(topic_pub,1));
   }
   volMapPub_ = nh_.advertise<volatile_map::VolatileMap>("/volatile_map", 1);
 }
@@ -47,14 +47,17 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   vol.failed_to_collect = false;
   vol.attempted = false;
   vol.honed = false;
-  vol.scout_id = std::atoi(&robot_number);
+  vol.slow = false;
 
+
+  vol.scout_id = std::atoi(&robot_number);
+  lastVolRecordedPerID_[vol.scout_id]=ros::Time::now();
   std::cout << vol.type << " " << vol.distance_to << " "  << vol.scout_id << std::endl;
 
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tf2_listener(tfBuffer);
   geometry_msgs::TransformStamped T_s2o; // transform sensor in obdo
-  try 
+  try
   {
     std::string odom_frame;
     std::string volSensor_frame;
@@ -71,8 +74,8 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     current_position.header.stamp=ros::Time::now();
 
     vol.position = current_position;
-  } 
-  catch (tf2::TransformException &ex) 
+  }
+  catch (tf2::TransformException &ex)
   {
     ROS_ERROR("%s", ex.what());
   }
@@ -80,7 +83,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   bool haveSeenThisVol= false;
   int index = -1;
 
-  for(std::vector<volatile_map::Volatile>::iterator it = VolatileMap_.vol.begin(); it != VolatileMap_.vol.end(); ++it) 
+  for(std::vector<volatile_map::Volatile>::iterator it = VolatileMap_.vol.begin(); it != VolatileMap_.vol.end(); ++it)
   {
     double dx = vol.position.point.x - it->position.point.x;
     double dy = vol.position.point.y - it->position.point.y;
@@ -97,11 +100,27 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   // if we have never seen this volatile, we push back and publish the map
   if(!haveSeenThisVol)
   {
+    if(!vol.slow){
+      vol.slow=true;
+
+      std_msgs::Int8 stop_msg;
+      stop_msg.data= 1;
+      stopScoutPub_[vol.scout_id].publish(stop_msg);
+    }
+
     VolatileMap_.vol.push_back(vol);
     volMapPub_.publish(VolatileMap_);
+
   }
   else
   {
+    if(!vol.slow){
+      vol.slow=true;
+
+      std_msgs::Int8 stop_msg;
+      stop_msg.data= 1;
+      stopScoutPub_[vol.scout_id].publish(stop_msg);
+    }
     // we have seen this volatile before.
     // was it recently?
     ros::Duration deltaT = ros::Time::now() - lastVolRecordedPerID_[vol.scout_id];
@@ -127,8 +146,8 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         if(!VolatileMap_.vol[index].honed)
         {
           VolatileMap_.vol[index].honed=true;
-          std_msgs::Bool stop_msg;
-          stop_msg.data= true;
+          std_msgs::Int8 stop_msg;
+          stop_msg.data= 2;
           stopScoutPub_[vol.scout_id].publish(stop_msg);
         }
       }
@@ -153,7 +172,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
 
 ///////////////////////////////////////////////////////////////////
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
   ros::init(argc, argv, "volatile_map");
 
@@ -165,7 +184,7 @@ int main(int argc, char **argv)
 
   VolatileMapper mapper(nh, num_scouts);
 
-  while (ros::ok()) 
+  while (ros::ok())
   {
     ros::spinOnce();
     // could pub vol map a pre-defined rate
