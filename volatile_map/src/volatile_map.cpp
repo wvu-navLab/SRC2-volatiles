@@ -114,8 +114,8 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   }
   else
   {
-    if(!vol.slow){
-      vol.slow=true;
+    if(!VolatileMap_.vol[index].slow){
+      VolatileMap_.vol[index].slow=true;
 
       std_msgs::Int8 stop_msg;
       stop_msg.data= 1;
