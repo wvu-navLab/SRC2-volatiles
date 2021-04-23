@@ -124,7 +124,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     if(deltaT.toSec() < timeOut_)
     {
       // are we closer now?
-      if(vol.distance_to <= VolatileMap_.vol[index].distance_to -eps_)
+      if(vol.distance_to <= VolatileMap_.vol[index].distance_to +eps_)
       {
         // if this is a continuous track and we are still getting closer,
         // replace the volatile and publish map again
