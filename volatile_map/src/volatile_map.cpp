@@ -115,13 +115,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   }
   else
   {
-    if(!VolatileMap_.vol[index].slow){
-      VolatileMap_.vol[index].slow=true;
-      std::cout << " We have seen this vol but have not triggered slow?" << std::endl;
-      std_msgs::Int64 stop_msg;
-      stop_msg.data= 1;
-      stopScoutPub_[vol.scout_id-1].publish(stop_msg);
-    }
+
     // we have seen this volatile before.
     // was it recently?
     ros::Duration deltaT = ros::Time::now() - lastVolRecordedPerID_[vol.scout_id-1];
@@ -133,6 +127,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
       {
         // if this is a continuous track and we are still getting closer,
         // replace the volatile and publish map again
+        vol.slow=true;
         VolatileMap_.vol[index] = vol;
         // republish map with -updated location
         volMapPub_.publish(VolatileMap_);
