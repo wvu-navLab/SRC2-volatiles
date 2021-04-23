@@ -149,7 +149,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
           VolatileMap_.vol[index].honed=true;
           std_msgs::Int64 stop_msg;
           stop_msg.data= 2;
-          std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to << std::endl;
+          std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to <<std::endl;
           stopScoutPub_[vol.scout_id-1].publish(stop_msg);
         }
       }
