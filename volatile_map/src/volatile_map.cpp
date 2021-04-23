@@ -28,7 +28,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   const ros::M_string& header = event.getConnectionHeader();
   std::string topic = header.at("topic");
   char robot_number = topic.c_str()[13];
-  std::cout << "debug " << robot_number << std::endl;
+  // std::cout << "debug " << robot_number << std::endl;
 
   const srcp2_msgs::VolSensorMsg::ConstPtr& msg = event.getMessage();
 
