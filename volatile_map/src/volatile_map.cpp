@@ -13,10 +13,10 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
     std::string topic_sub;
     std::string topic_pub;
     topic_sub = "/small_scout_" + std::to_string(i+1) + "/volatile_sensor";
-    topic_pub = "/small_scout_" + std::to_string(i+1) + "/volatile_map/stop";
+    topic_pub = "/small_scout_" + std::to_string(i+1) + "/volatile_map/cmd";
     volSubs_.push_back(nh_.subscribe(topic_sub, 1, &VolatileMapper::volatileSensorCallBack_, this));
     lastVolRecordedPerID_.push_back(ros::Time::now());
-    stopScoutPub_.push_back(nh_.advertise<std_msgs::Int8>(topic_pub,1));
+    stopScoutPub_.push_back(nh_.advertise<std_msgs::Int64>(topic_pub,1));
   }
   volMapPub_ = nh_.advertise<volatile_map::VolatileMap>("/volatile_map", 1);
 }
@@ -28,7 +28,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   const ros::M_string& header = event.getConnectionHeader();
   std::string topic = header.at("topic");
   char robot_number = topic.c_str()[13];
-  std::cout << "debug " << robot_number << std::endl;
+  // std::cout << "debug " << robot_number << std::endl;
 
   const srcp2_msgs::VolSensorMsg::ConstPtr& msg = event.getMessage();
 
@@ -147,7 +147,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         if(!VolatileMap_.vol[index].honed)
         {
           VolatileMap_.vol[index].honed=true;
-          std_msgs::Int8 stop_msg;
+          std_msgs::Int64 stop_msg;
           stop_msg.data= 2;
           std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to std::endl;
           stopScoutPub_[vol.scout_id-1].publish(stop_msg);

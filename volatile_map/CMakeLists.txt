@@ -110,7 +110,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS message_runtime message_generation std_msgs nav_msgs geometry_msgs
+  CATKIN_DEPENDS message_runtime message_generation std_msgs nav_msgs
 #  DEPENDS system_lib
 )
 
