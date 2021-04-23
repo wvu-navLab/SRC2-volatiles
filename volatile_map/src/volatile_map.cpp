@@ -7,7 +7,7 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
 {
   timeOut_=0.5;
   distanceThresh_=10;
-  eps_ = 0.02;
+  eps_ = 0.001;
 
   for (int i=0; i<num_scouts; i++)
   {
