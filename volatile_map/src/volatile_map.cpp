@@ -7,6 +7,7 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
 {
   timeOut_=0.5;
   distanceThresh_=10;
+  eps_ = 0.02;
 
   for (int i=0; i<num_scouts; i++)
   {
@@ -123,11 +124,12 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     if(deltaT.toSec() < timeOut_)
     {
       // are we closer now?
-      if(vol.distance_to <= VolatileMap_.vol[index].distance_to)
+      if(vol.distance_to <= VolatileMap_.vol[index].distance_to -eps_)
       {
         // if this is a continuous track and we are still getting closer,
         // replace the volatile and publish map again
         vol.slow=true;
+        if(VolatileMap_.vol[index].honed) vol.honed = true;
         VolatileMap_.vol[index] = vol;
         // republish map with -updated location
         volMapPub_.publish(VolatileMap_);

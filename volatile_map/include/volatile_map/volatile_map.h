@@ -35,6 +35,7 @@ private:
   std::vector<ros::Time> lastVolRecordedPerID_;
   double timeOut_;
   double distanceThresh_;
+  double eps_;
 
 
 
