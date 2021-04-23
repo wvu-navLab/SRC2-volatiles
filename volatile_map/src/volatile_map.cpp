@@ -51,7 +51,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
 
 
   vol.scout_id = std::atoi(&robot_number);
-  lastVolRecordedPerID_[vol.scout_id]=ros::Time::now();
+  lastVolRecordedPerID_[vol.scout_id-1]=ros::Time::now();
   std::cout << vol.type << " " << vol.distance_to << " "  << vol.scout_id << std::endl;
 
   tf2_ros::Buffer tfBuffer;
@@ -92,6 +92,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     // TODO TEST THESE THRESH
     if(distance < distanceThresh_ && (vol.type == it-> type))
     {
+      std::cout << "WE HAVE SEEN THIS VOL and  " << distance << std::endl;
       haveSeenThisVol = true;
       index = it-VolatileMap_.vol.begin();
     }
@@ -102,10 +103,10 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   {
     if(!vol.slow){
       vol.slow=true;
-
+      std::cout << " Have Not Seen this Vol  and Publish Slow " << std::endl;
       std_msgs::Int8 stop_msg;
       stop_msg.data= 1;
-      stopScoutPub_[vol.scout_id].publish(stop_msg);
+      stopScoutPub_[vol.scout_id-1].publish(stop_msg);
     }
 
     VolatileMap_.vol.push_back(vol);
@@ -116,24 +117,24 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   {
     if(!VolatileMap_.vol[index].slow){
       VolatileMap_.vol[index].slow=true;
-
+      std::cout << " We have seen this vol but have not triggered slow?" << std::endl;
       std_msgs::Int8 stop_msg;
       stop_msg.data= 1;
       stopScoutPub_[vol.scout_id-1].publish(stop_msg);
     }
     // we have seen this volatile before.
     // was it recently?
-    ros::Duration deltaT = ros::Time::now() - lastVolRecordedPerID_[vol.scout_id];
+    ros::Duration deltaT = ros::Time::now() - lastVolRecordedPerID_[vol.scout_id-1];
     // TODO TEST THIS TIMEOUT THRESH
     if(deltaT.toSec() < timeOut_)
     {
       // are we closer now?
-      if(vol.distance_to < VolatileMap_.vol[index].distance_to)
+      if(vol.distance_to <= VolatileMap_.vol[index].distance_to)
       {
         // if this is a continuous track and we are still getting closer,
         // replace the volatile and publish map again
         VolatileMap_.vol[index] = vol;
-        // republish map with updated location
+        // republish map with -updated location
         volMapPub_.publish(VolatileMap_);
 
       }
@@ -148,6 +149,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
           VolatileMap_.vol[index].honed=true;
           std_msgs::Int8 stop_msg;
           stop_msg.data= 2;
+          std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to std::endl;
           stopScoutPub_[vol.scout_id-1].publish(stop_msg);
         }
       }
