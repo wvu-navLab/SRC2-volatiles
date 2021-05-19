@@ -93,7 +93,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     // TODO TEST THESE THRESH
     if(distance < distanceThresh_ && (vol.type == it-> type))
     {
-      std::cout << "WE HAVE SEEN THIS VOL and  " << distance << std::endl;
+      // std::cout << "WE HAVE SEEN THIS VOL and  " << distance << std::endl;
       haveSeenThisVol = true;
       index = it-VolatileMap_.vol.begin();
     }
@@ -104,7 +104,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   {
     if(!vol.slow){
       vol.slow=true;
-      std::cout << " Have Not Seen this Vol  and Publish Slow " << std::endl;
+      // std::cout << " Have Not Seen this Vol  and Publish Slow " << std::endl;
       std_msgs::Int64 stop_msg;
       stop_msg.data= 1;
       stopScoutPub_[vol.scout_id-1].publish(stop_msg);
@@ -146,7 +146,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
           VolatileMap_.vol[index].honed=true;
           std_msgs::Int64 stop_msg;
           stop_msg.data= 2;
-          std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to <<std::endl;
+          // std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to <<std::endl;
           stopScoutPub_[vol.scout_id-1].publish(stop_msg);
         }
       }
