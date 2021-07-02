@@ -99,7 +99,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     }
   }
 
-  // if we have never seen this volatile, we push back and publish the map
+  // if we have never seen this volatile, we push back
   if(!haveSeenThisVol)
   {
     if(!vol.slow){
@@ -111,7 +111,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     }
 
     VolatileMap_.vol.push_back(vol);
-    volMapPub_.publish(VolatileMap_);
+  //  volMapPub_.publish(VolatileMap_);
 
   }
   else
@@ -131,13 +131,13 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         vol.slow=true;
         if(VolatileMap_.vol[index].honed) vol.honed = true;
         VolatileMap_.vol[index] = vol;
-        // republish map with -updated location
-        volMapPub_.publish(VolatileMap_);
+        //volMapPub_.publish(VolatileMap_);
 
       }
       // continuous tracking, but now we are farther away than we were
       else
       {
+
         // publish flag to tell state machine to STOP
         // only if we are aleady trying this honeing manuever
         // dont keep this volatile and dont publish map
@@ -149,6 +149,9 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
           // std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to <<std::endl;
           stopScoutPub_[vol.scout_id-1].publish(stop_msg);
         }
+        // publish the volatile map with the closest location we found
+        volMapPub_.publish(VolatileMap_);
+
       }
     }
     else
