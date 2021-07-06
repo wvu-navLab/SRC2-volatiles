@@ -144,11 +144,11 @@ include_directories(
 
 add_executable(volatile_map src/volatile_map.cpp)
 target_link_libraries(volatile_map ${catkin_LIBRARIES})
-add_dependencies(volatile_map volatile_map_generate_messages_cpp)
+add_dependencies(volatile_map volatile_map_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
 add_executable(dummy_mapper src/dummy_mapper.cpp)
 target_link_libraries(dummy_mapper ${catkin_LIBRARIES})
-add_dependencies(dummy_mapper ${catkin_EXPORTED_TARGETS})
+add_dependencies(dummy_mapper volatile_map_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
 # add_executable(volatile_truth src/volatile_truth.cpp)
 # target_link_libraries(volatile_truth ${catkin_LIBRARIES})
