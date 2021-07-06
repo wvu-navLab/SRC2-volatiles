@@ -186,9 +186,11 @@ int main(int argc, char **argv)
 
   VolatileMapper mapper(nh, num_scouts);
 
+  ros::Rate rate(10);
   while (ros::ok())
   {
     ros::spinOnce();
+    rate.sleep();
     // could pub vol map a pre-defined rate
   }
 
