@@ -150,9 +150,9 @@ add_executable(dummy_mapper src/dummy_mapper.cpp)
 target_link_libraries(dummy_mapper ${catkin_LIBRARIES})
 add_dependencies(dummy_mapper ${catkin_EXPORTED_TARGETS})
 
-add_executable(volatile_truth src/volatile_truth.cpp)
-target_link_libraries(volatile_truth ${catkin_LIBRARIES})
-add_dependencies(volatile_truth ${catkin_EXPORTED_TARGETS})
+# add_executable(volatile_truth src/volatile_truth.cpp)
+# target_link_libraries(volatile_truth ${catkin_LIBRARIES})
+# add_dependencies(volatile_truth ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
