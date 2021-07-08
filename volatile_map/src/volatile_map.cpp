@@ -20,9 +20,20 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
     stopScoutPub_.push_back(nh_.advertise<std_msgs::Int64>(topic_pub,1));
   }
   volMapPub_ = nh_.advertise<volatile_map::VolatileMap>("/volatile_map", 1);
+
+  markCollectedServer_ = nh_.advertiseService("mark_collected",&VolatileMapper::markCollected_,this);
 }
 
+bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, volatile_map::MarkCollected::Response &res){
+  int volIndex = req.vol_index;
+  bool collected = req.collected;
 
+  VolatileMap_.vol[volIndex].collected = collected;
+  volMapPub_.publish(VolatileMap_);
+  res.success=true;
+
+	return true;
+}
 
 void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event)
 {
@@ -43,7 +54,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
 
   vol.type = msg->vol_type;
   vol.distance_to = msg->distance_to;
-  vol.smoothed = false;
+  vol.wellKnown = false;
   vol.collected = false;
   vol.failed_to_collect = false;
   vol.attempted = false;

@@ -13,6 +13,7 @@
 #include <std_msgs/Int64.h>
 #include <volatile_map/Volatile.h>
 #include <volatile_map/VolatileMap.h>
+#include <volatile_map/MarkCollected.h>
 
 class VolatileMapper
 {
@@ -27,7 +28,7 @@ private:
   std::vector<ros::Publisher> stopScoutPub_;
 
   void volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event);
-
+  bool markCollected_(volatile_map::MarkCollected::Request &req, volatile_map::MarkCollected::Response &res);
 
   ros::Publisher volMapPub_;
 
@@ -36,6 +37,10 @@ private:
   double timeOut_;
   double distanceThresh_;
   double eps_;
+
+
+  ros::ServiceServer markCollectedServer_;
+
 
 
 

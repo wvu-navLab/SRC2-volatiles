@@ -3,7 +3,7 @@ geometry_msgs/PointStamped position
 string type
 float32 distance_to
 int8 scout_id
-bool smoothed
+bool wellKnown
 bool attempted
 bool failed_to_collect
 bool collected
