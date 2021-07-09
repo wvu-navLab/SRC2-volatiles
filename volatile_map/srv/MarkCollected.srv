@@ -1,4 +1,5 @@
 int8 vol_index
 bool collected
+bool attempted
 ---
 bool success
