@@ -27,8 +27,9 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
 bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, volatile_map::MarkCollected::Response &res){
   int volIndex = req.vol_index;
   bool collected = req.collected;
-
+  bool attempted = req.attempted;
   VolatileMap_.vol[volIndex].collected = collected;
+  VolatileMap_.vol[volIndex].attempted = attempted;
   volMapPub_.publish(VolatileMap_);
   res.success=true;
 
