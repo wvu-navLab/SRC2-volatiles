@@ -21,7 +21,7 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
   }
   volMapPub_ = nh_.advertise<volatile_map::VolatileMap>("/volatile_map", 1);
 
-  markCollectedServer_ = nh_.advertiseService("mark_collected",&VolatileMapper::markCollected_,this);
+  markCollectedServer_ = nh_.advertiseService("/volatile_map_mark_collected",&VolatileMapper::markCollected_,this);
 }
 
 bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, volatile_map::MarkCollected::Response &res){
