@@ -7,5 +7,6 @@ bool wellKnown
 bool attempted
 bool failed_to_collect
 bool collected
+bool dumped
 bool honed
 bool slow
