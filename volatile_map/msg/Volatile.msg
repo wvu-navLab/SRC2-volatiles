@@ -10,4 +10,3 @@ bool collected
 bool dumped
 bool honed
 bool slow
-bool dumped
