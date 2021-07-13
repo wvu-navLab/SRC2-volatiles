@@ -23,7 +23,7 @@ public:
 private:
   ros::NodeHandle & nh_;
   volatile_map::VolatileMap VolatileMap_;
-
+  int num_vols_;
   std::vector<ros::Subscriber> volSubs_;
   std::vector<ros::Publisher> stopScoutPub_;
 

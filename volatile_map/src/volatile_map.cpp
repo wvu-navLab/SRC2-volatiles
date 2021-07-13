@@ -8,6 +8,7 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
   timeOut_=0.5;
   distanceThresh_=10;
   eps_ = 0.001;
+  num_vols_=0;
 
   for (int i=0; i<num_scouts; i++)
   {
@@ -121,8 +122,9 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
       stop_msg.data= 1;
       stopScoutPub_[vol.scout_id-1].publish(stop_msg);
     }
-
+    vol.vol_index = num_vols_;
     VolatileMap_.vol.push_back(vol);
+    num_vols_ = num_vols_+1;
   //  volMapPub_.publish(VolatileMap_);
 
   }
