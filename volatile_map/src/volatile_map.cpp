@@ -60,10 +60,12 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   vol.distance_to = msg->distance_to;
   vol.wellKnown = false;
   vol.collected = false;
+  vol.vol_index = 0;
   vol.failed_to_collect = false;
   vol.attempted = false;
   vol.honed = false;
   vol.slow = false;
+
 
 
   vol.scout_id = std::atoi(&robot_number);
@@ -145,6 +147,10 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         // if this is a continuous track and we are still getting closer,
         // replace the volatile and publish map again
         vol.slow=true;
+        vol.vol_index=VolatileMap_.vol[index].vol_index;
+        vol.collected=VolatileMap_.vol[index].collected;
+        vol.attempted=VolatileMap_.vol[index].attempted;
+        vol.honed=VolatileMap_.vol[index].honed;
         if(VolatileMap_.vol[index].honed) vol.honed = true;
         VolatileMap_.vol[index] = vol;
         //volMapPub_.publish(VolatileMap_);
@@ -177,6 +183,10 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
       // for now, only replace if it has been marked as a failed_to_collect volatile
       if(VolatileMap_.vol[index].failed_to_collect)
       {
+        vol.vol_index=VolatileMap_.vol[index].vol_index;
+        vol.collected=VolatileMap_.vol[index].collected;
+        vol.attempted=VolatileMap_.vol[index].attempted;
+        vol.honed=VolatileMap_.vol[index].honed;
         VolatileMap_.vol[index] = vol;
         volMapPub_.publish(VolatileMap_);
       }
