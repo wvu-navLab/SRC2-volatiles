@@ -203,7 +203,7 @@ int main(int argc, char **argv)
   VolatileMapper mapper(nh, num_scouts);
 
   ros::Rate rate(10);
-  count =0;
+  int count = 0;
   while (ros::ok())
   {
     ros::spinOnce();
@@ -212,7 +212,7 @@ int main(int argc, char **argv)
     if(count == 10)
     {
       mapper.Publish();
-      count =0;
+      count = 0;
     }
     // could pub vol map a pre-defined rate
   }
