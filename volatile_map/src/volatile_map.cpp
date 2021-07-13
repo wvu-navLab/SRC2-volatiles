@@ -36,7 +36,9 @@ bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, v
 
 	return true;
 }
-
+void VolatileMapper::Publish(){
+  volMapPub_.publish(VolatileMap_);
+}
 void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event)
 {
   const ros::M_string& header = event.getConnectionHeader();
@@ -201,10 +203,17 @@ int main(int argc, char **argv)
   VolatileMapper mapper(nh, num_scouts);
 
   ros::Rate rate(10);
+  count =0;
   while (ros::ok())
   {
     ros::spinOnce();
     rate.sleep();
+    count = count +1;
+    if(count == 10)
+    {
+      mapper.Publish();
+      count =0;
+    }
     // could pub vol map a pre-defined rate
   }
 

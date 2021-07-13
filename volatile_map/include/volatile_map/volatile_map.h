@@ -19,6 +19,7 @@ class VolatileMapper
 {
 public:
   VolatileMapper(ros::NodeHandle &, int num_scouts);
+  void Publish();
 
 private:
   ros::NodeHandle & nh_;
