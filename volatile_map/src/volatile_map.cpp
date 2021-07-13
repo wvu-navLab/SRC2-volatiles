@@ -29,8 +29,15 @@ bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, v
   int volIndex = req.vol_index;
   bool collected = req.collected;
   bool attempted = req.attempted;
-  VolatileMap_.vol[volIndex].collected = collected;
-  VolatileMap_.vol[volIndex].attempted = attempted;
+  for (int i=0; i< VolatileMap_.vol.size(); i++)
+  {
+    if(volIndex == VolatileMap_.vol[i].vol_index)
+    {
+    VolatileMap_.vol[volIndex].collected = collected;
+    VolatileMap_.vol[volIndex].attempted = attempted;
+    }  
+  }
+
   volMapPub_.publish(VolatileMap_);
   res.success=true;
 
