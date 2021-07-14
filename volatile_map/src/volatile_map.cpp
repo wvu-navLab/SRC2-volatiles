@@ -9,6 +9,8 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
   distanceThresh_=8;
   eps_ = 0.001;
   num_vols_=0;
+  num_collect_ =0;
+  num_attempt_ =0;
 
   for (int i=0; i<num_scouts; i++)
   {
@@ -29,12 +31,15 @@ bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, v
   int volIndex = req.vol_index;
   bool collected = req.collected;
   bool attempted = req.attempted;
+  if(collected) num_collect_ = num_collect_ +1;
+  if(attempted) num_attempt_ = num_attempt_ +1;
   for (int i=0; i< VolatileMap_.vol.size(); i++)
   {
     if(volIndex == VolatileMap_.vol[i].vol_index)
     {
     VolatileMap_.vol[i].collected = collected;
     VolatileMap_.vol[i].attempted = attempted;
+    ROS_WARN_STREAM("VolMapper: Marking Vol" << volIndex << " Collected: " << collected << " Attempted:" << attempted );
     }
   }
 
@@ -45,6 +50,7 @@ bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, v
 }
 void VolatileMapper::Publish(){
   volMapPub_.publish(VolatileMap_);
+  ROS_INFO_STREAM(" !!Volatile Mapper!! # Vols Mapped -->" << num_vols_ << " # Attemped -->" << num_attempt_ << " Collected -->" << num_collect_);
 }
 void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event)
 {
@@ -230,6 +236,7 @@ int main(int argc, char **argv)
     {
       mapper.Publish();
       count = 0;
+
     }
     // could pub vol map a pre-defined rate
   }
