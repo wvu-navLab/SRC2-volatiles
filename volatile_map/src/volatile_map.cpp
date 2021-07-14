@@ -33,9 +33,9 @@ bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, v
   {
     if(volIndex == VolatileMap_.vol[i].vol_index)
     {
-    VolatileMap_.vol[volIndex].collected = collected;
-    VolatileMap_.vol[volIndex].attempted = attempted;
-    }  
+    VolatileMap_.vol[i].collected = collected;
+    VolatileMap_.vol[i].attempted = attempted;
+    }
   }
 
   volMapPub_.publish(VolatileMap_);
