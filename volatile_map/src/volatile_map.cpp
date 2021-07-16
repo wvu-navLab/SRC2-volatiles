@@ -120,6 +120,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   vol.failed_to_collect = false;
   vol.attempted = false;
   vol.honing = false;
+  vol.honed = false;
   vol.slow = false;
 
 
@@ -226,7 +227,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         vol.collected=VolatileMap_.vol[index].collected;
         vol.attempted=VolatileMap_.vol[index].attempted;
         vol.honing=VolatileMap_.vol[index].honing;
-        if(VolatileMap_.vol[index].honing) vol.honing = true;
+        vol.honed=VolatileMap_.vol[index].honed;
         VolatileMap_.vol[index] = vol;
         //volMapPub_.publish(VolatileMap_);
 
@@ -270,6 +271,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         vol.collected=VolatileMap_.vol[index].collected;
         vol.attempted=VolatileMap_.vol[index].attempted;
         vol.honing=VolatileMap_.vol[index].honing;
+        vol.honed=VolatileMap_.vol[index].honed;
         VolatileMap_.vol[index] = vol;
         volMapPub_.publish(VolatileMap_);
       }
