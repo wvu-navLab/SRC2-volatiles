@@ -119,7 +119,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   vol.vol_index = 0;
   vol.failed_to_collect = false;
   vol.attempted = false;
-  vol.honed = false;
+  vol.honing = false;
   vol.slow = false;
 
 
@@ -225,8 +225,8 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         vol.vol_index=VolatileMap_.vol[index].vol_index;
         vol.collected=VolatileMap_.vol[index].collected;
         vol.attempted=VolatileMap_.vol[index].attempted;
-        vol.honed=VolatileMap_.vol[index].honed;
-        if(VolatileMap_.vol[index].honed) vol.honed = true;
+        vol.honing=VolatileMap_.vol[index].honing;
+        if(VolatileMap_.vol[index].honing) vol.honing = true;
         VolatileMap_.vol[index] = vol;
         //volMapPub_.publish(VolatileMap_);
 
@@ -236,16 +236,24 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
       {
 
         // publish flag to tell state machine to STOP
-        // only if we are aleady trying this honeing manuever
+        // if we already told to slow, but have not triggered honing
         // dont keep this volatile and dont publish map
-        if(!VolatileMap_.vol[index].honed)
+        if(!VolatileMap_.vol[index].honing && VolatileMap_.vol[index].slow)
         {
-          VolatileMap_.vol[index].honed=true;
+          VolatileMap_.vol[index].honing=true;
           std_msgs::Int64 stop_msg;
           stop_msg.data= 2;
           // std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to <<std::endl;
           stopScoutPub_[vol.scout_id-1].publish(stop_msg);
         }
+        else if(VolatileMap_.vol[index].honing && VolatileMap_.vol[index].slow )
+        {
+          // this condition means that we have triggered a slow to SM when first seeing
+          // we have also trigger honing, and now we are further away
+          // this means we are honed
+          VolatileMap_.vol[index].honed = true;
+        }
+
         // publish the volatile map with the closest location we found
         volMapPub_.publish(VolatileMap_);
 
@@ -261,7 +269,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         vol.vol_index=VolatileMap_.vol[index].vol_index;
         vol.collected=VolatileMap_.vol[index].collected;
         vol.attempted=VolatileMap_.vol[index].attempted;
-        vol.honed=VolatileMap_.vol[index].honed;
+        vol.honing=VolatileMap_.vol[index].honing;
         VolatileMap_.vol[index] = vol;
         volMapPub_.publish(VolatileMap_);
       }
