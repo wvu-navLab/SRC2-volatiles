@@ -11,6 +11,8 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
   num_vols_=0;
   num_collect_ =0;
   num_attempt_ =0;
+  num_vols_scout_1_=0;
+  num_vols_scout_2_=0;
 
   for (int i=0; i<num_scouts; i++)
   {
@@ -25,6 +27,9 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
   volMapPub_ = nh_.advertise<volatile_map::VolatileMap>("/volatile_map", 1);
 
   markCollectedServer_ = nh_.advertiseService("/volatile_map_mark_collected",&VolatileMapper::markCollected_,this);
+
+    clt_sf_true_pose_sc1 = nh.serviceClient<sensor_fusion::GetTruePose>("/small_scout_1/true_pose");
+    clt_sf_true_pose_sc2 = nh.serviceClient<sensor_fusion::GetTruePose>("/small_scout_2/true_pose");
 }
 
 bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, volatile_map::MarkCollected::Response &res){
@@ -52,6 +57,44 @@ void VolatileMapper::Publish(){
   volMapPub_.publish(VolatileMap_);
   ROS_INFO_STREAM(" !!Volatile Mapper!! # Vols Mapped -->" << num_vols_ << " # Attemped -->" << num_attempt_ << " Collected -->" << num_collect_);
 }
+
+void VolatileMapper::GetTruePose(int scout_id)
+{
+  // Update SF with True Pose
+  sensor_fusion::GetTruePose srv_sf_true_pose;
+  srv_sf_true_pose.request.start = true;
+  srv_sf_true_pose.request.initialize = false;
+
+  if(scout_id == 1)
+  {
+    if (clt_sf_true_pose_sc1.call(srv_sf_true_pose))
+    {
+      ROS_INFO_STREAM("[Vol Map Scout 1] Called service TruePose");
+
+    }
+    else
+    {
+      ROS_INFO_STREAM("[Vol Map Scout 1] Failed to Call service TruePose");
+    }
+  }
+
+  if(scout_id == 2)
+  {
+    if (clt_sf_true_pose_sc2.call(srv_sf_true_pose))
+    {
+      ROS_INFO_STREAM("[Vol Map Scout 2] Called service TruePose");
+
+    }
+    else
+    {
+      ROS_INFO_STREAM("[Vol Map Scout 2] Failed to Call service TruePose");
+    }
+  }
+
+
+}
+
+
 void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event)
 {
   const ros::M_string& header = event.getConnectionHeader();
@@ -142,6 +185,25 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     vol.vol_index = num_vols_;
     VolatileMap_.vol.push_back(vol);
     num_vols_ = num_vols_+1;
+
+    if(vol.scout_id == 1)
+    {
+      num_vols_scout_1_ = num_vols_scout_1_ +1;
+    }
+    if(vol.scout_id == 2)
+    {
+      num_vols_scout_2_ = num_vols_scout_2_ +1;
+    }
+    if(num_vols_scout_1_ == 2)
+    {
+      GetTruePose(1);
+    }
+
+    if(num_vols_scout_1_ == 2)
+    {
+      GetTruePose(2);
+    }
+
   //  volMapPub_.publish(VolatileMap_);
 
   }

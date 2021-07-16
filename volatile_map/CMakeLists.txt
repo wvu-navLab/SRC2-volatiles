@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   srcp2_msgs
   tf
+  sensor_fusion
   )
 
 ## System dependencies are found with CMake's conventions

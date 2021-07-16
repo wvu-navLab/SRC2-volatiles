@@ -14,6 +14,7 @@
 #include <volatile_map/Volatile.h>
 #include <volatile_map/VolatileMap.h>
 #include <volatile_map/MarkCollected.h>
+#include <sensor_fusion/GetTruePose.h>
 
 class VolatileMapper
 {
@@ -24,13 +25,13 @@ public:
 private:
   ros::NodeHandle & nh_;
   volatile_map::VolatileMap VolatileMap_;
-  int num_vols_, num_collect_, num_attempt_;
+  int num_vols_, num_collect_, num_attempt_ ,num_vols_scout_1_, num_vols_scout_2_;
   std::vector<ros::Subscriber> volSubs_;
   std::vector<ros::Publisher> stopScoutPub_;
 
   void volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event);
   bool markCollected_(volatile_map::MarkCollected::Request &req, volatile_map::MarkCollected::Response &res);
-
+  void GetTruePose(int scout_id);
   ros::Publisher volMapPub_;
 
   // used for timers to determine time since last have seen a vol
@@ -41,6 +42,7 @@ private:
 
 
   ros::ServiceServer markCollectedServer_;
+  ros::ServiceClient clt_sf_true_pose_sc1,clt_sf_true_pose_sc2;
 
 
 
