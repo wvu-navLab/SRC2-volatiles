@@ -12,3 +12,4 @@ bool dumped
 bool honed
 bool honing
 bool slow
+int8 robot_id_assigned

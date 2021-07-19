@@ -53,6 +53,29 @@ bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, v
 
 	return true;
 }
+
+bool VolatileMapper::markAssigned_(volatile_map::MarkAssigned::Request &req, volatile_map::MarkAssigned::Response &res){
+  int robot_id = req.robot_id_assigned;
+  int volIndex = req.vol_index;
+
+
+  for (int i=0; i< VolatileMap_.vol.size(); i++)
+  {
+    if(volIndex == VolatileMap_.vol[i].vol_index)
+    {
+    VolatileMap_.vol[i].robot_id_assigned = robot_id;
+    
+    ROS_WARN_STREAM("VolMapper: Marking Vol" << volIndex << " Assigned to: " << robot_id );
+    }
+  }
+
+  volMapPub_.publish(VolatileMap_);
+  res.success=true;
+
+	return true;
+}
+
+
 void VolatileMapper::Publish(){
   volMapPub_.publish(VolatileMap_);
   ROS_INFO_STREAM(" !!Volatile Mapper!! # Vols Mapped -->" << num_vols_ << " # Attemped -->" << num_attempt_ << " Collected -->" << num_collect_);

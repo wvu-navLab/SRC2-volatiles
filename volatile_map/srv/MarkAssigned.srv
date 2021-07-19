@@ -1,0 +1,4 @@
+int8 vol_index
+int8 robot_id_assigned
+---
+bool success

@@ -14,6 +14,7 @@
 #include <volatile_map/Volatile.h>
 #include <volatile_map/VolatileMap.h>
 #include <volatile_map/MarkCollected.h>
+#include <volatile_map/MarkAssigned.h>
 #include <sensor_fusion/GetTruePose.h>
 
 class VolatileMapper
@@ -31,6 +32,7 @@ private:
 
   void volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event);
   bool markCollected_(volatile_map::MarkCollected::Request &req, volatile_map::MarkCollected::Response &res);
+  bool markAssigned_(volatile_map::MarkAssigned::Request &req, volatile_map::MarkAssigned::Response &res);
   void GetTruePose(int scout_id);
   ros::Publisher volMapPub_;
 
@@ -41,7 +43,7 @@ private:
   double eps_;
 
 
-  ros::ServiceServer markCollectedServer_;
+  ros::ServiceServer markCollectedServer_, markAssignedServer_;
   ros::ServiceClient clt_sf_true_pose_sc1,clt_sf_true_pose_sc2;
 
 
