@@ -26,7 +26,8 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
   }
   volMapPub_ = nh_.advertise<volatile_map::VolatileMap>("/volatile_map", 1);
 
-  markCollectedServer_ = nh_.advertiseService("/volatile_map_mark_collected",&VolatileMapper::markCollected_,this);
+  markCollectedServer_ = nh_.advertiseService("/volatile_map/mark_collected",&VolatileMapper::markCollected_,this);
+  markAssignedServer_ = nh_.advertiseService("/volatile_map/mark_assigned",&VolatileMapper::markAssigned_,this);
 
     clt_sf_true_pose_sc1 = nh.serviceClient<sensor_fusion::GetTruePose>("/small_scout_1/true_pose");
     clt_sf_true_pose_sc2 = nh.serviceClient<sensor_fusion::GetTruePose>("/small_scout_2/true_pose");
@@ -145,6 +146,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   vol.honing = false;
   vol.honed = false;
   vol.slow = false;
+  vol.robot_id_assigned =0;
 
 
 
@@ -251,6 +253,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         vol.attempted=VolatileMap_.vol[index].attempted;
         vol.honing=VolatileMap_.vol[index].honing;
         vol.honed=VolatileMap_.vol[index].honed;
+        vol.robot_id_assigned=VolatileMap_.vol[index].robot_id_assigned;
         VolatileMap_.vol[index] = vol;
         //volMapPub_.publish(VolatileMap_);
 
@@ -295,6 +298,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         vol.attempted=VolatileMap_.vol[index].attempted;
         vol.honing=VolatileMap_.vol[index].honing;
         vol.honed=VolatileMap_.vol[index].honed;
+        vol.robot_id_assigned=VolatileMap_.vol[index].robot_id_assigned;
         VolatileMap_.vol[index] = vol;
         volMapPub_.publish(VolatileMap_);
       }
