@@ -22,12 +22,13 @@ VolatileMapper::VolatileMapper(ros::NodeHandle &nh, int num_scouts)
     topic_pub = "/small_scout_" + std::to_string(i+1) + "/volatile_map/cmd";
     volSubs_.push_back(nh_.subscribe(topic_sub, 1, &VolatileMapper::volatileSensorCallBack_, this));
     lastVolRecordedPerID_.push_back(ros::Time::now());
-    stopScoutPub_.push_back(nh_.advertise<std_msgs::Int64>(topic_pub,1));
+    stopScoutPub_.push_back(nh_.advertise<volatile_map::VolCmd>(topic_pub,1));
   }
   volMapPub_ = nh_.advertise<volatile_map::VolatileMap>("/volatile_map", 1);
 
   markCollectedServer_ = nh_.advertiseService("/volatile_map/mark_collected",&VolatileMapper::markCollected_,this);
   markAssignedServer_ = nh_.advertiseService("/volatile_map/mark_assigned",&VolatileMapper::markAssigned_,this);
+  markHonedServer_ = nh_.advertiseService("/volatile_map/mark_honed",&VolatileMapper::markHoned_,this);
 
     clt_sf_true_pose_sc1 = nh.serviceClient<sensor_fusion::GetTruePose>("/small_scout_1/true_pose");
     clt_sf_true_pose_sc2 = nh.serviceClient<sensor_fusion::GetTruePose>("/small_scout_2/true_pose");
@@ -55,6 +56,25 @@ bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, v
 	return true;
 }
 
+bool VolatileMapper::markHoned_(volatile_map::MarkHoned::Request &req, volatile_map::MarkHoned::Response &res){
+  int volIndex = req.vol_index;
+  bool honed = req.honed;
+  for (int i=0; i< VolatileMap_.vol.size(); i++)
+  {
+    if(volIndex == VolatileMap_.vol[i].vol_index)
+    {
+    VolatileMap_.vol[i].honed = honed;
+    ROS_WARN_STREAM("VolMapper: Marking Vol" << volIndex << " Honed: " << honed );
+    }
+  }
+
+  volMapPub_.publish(VolatileMap_);
+  res.success=true;
+
+	return true;
+}
+
+
 bool VolatileMapper::markAssigned_(volatile_map::MarkAssigned::Request &req, volatile_map::MarkAssigned::Response &res){
   int robot_id = req.robot_id_assigned;
   int volIndex = req.vol_index;
@@ -65,7 +85,7 @@ bool VolatileMapper::markAssigned_(volatile_map::MarkAssigned::Request &req, vol
     if(volIndex == VolatileMap_.vol[i].vol_index)
     {
     VolatileMap_.vol[i].robot_id_assigned = robot_id;
-    
+
     ROS_WARN_STREAM("VolMapper: Marking Vol" << volIndex << " Assigned to: " << robot_id );
     }
   }
@@ -204,9 +224,10 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     if(!vol.slow){
       vol.slow=true;
       // std::cout << " Have Not Seen this Vol  and Publish Slow " << std::endl;
-      std_msgs::Int64 stop_msg;
-      stop_msg.data= 1;
-      stopScoutPub_[vol.scout_id-1].publish(stop_msg);
+      volatile_map::VolCmd cmd_msg;
+      cmd_msg.cmd= 1;
+      cmd_msg.vol_index = vol.vol_index;
+      stopScoutPub_[vol.scout_id-1].publish(cmd_msg);
     }
     vol.vol_index = num_vols_;
     VolatileMap_.vol.push_back(vol);
@@ -268,17 +289,18 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
         if(!VolatileMap_.vol[index].honing && VolatileMap_.vol[index].slow)
         {
           VolatileMap_.vol[index].honing=true;
-          std_msgs::Int64 stop_msg;
-          stop_msg.data= 2;
+          volatile_map::VolCmd cmd_msg;
+          cmd_msg.cmd = 2;
+          cmd_msg.vol_index = VolatileMap_.vol[index].vol_index;
           // std::cout << " Publishing Stop " << vol.distance_to << " " << VolatileMap_.vol[index].distance_to <<std::endl;
-          stopScoutPub_[vol.scout_id-1].publish(stop_msg);
+          stopScoutPub_[vol.scout_id-1].publish(cmd_msg);
         }
         else if(VolatileMap_.vol[index].honing && VolatileMap_.vol[index].slow )
         {
           // this condition means that we have triggered a slow to SM when first seeing
           // we have also trigger honing, and now we are further away
           // this means we are honed
-          VolatileMap_.vol[index].honed = true;
+      //    VolatileMap_.vol[index].honed = true;
         }
 
         // publish the volatile map with the closest location we found

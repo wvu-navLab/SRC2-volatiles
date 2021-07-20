@@ -57,6 +57,7 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
    Volatile.msg
    VolatileMap.msg
+   VolCmd.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -64,6 +65,7 @@ find_package(catkin REQUIRED COMPONENTS
   FILES
   MarkCollected.srv
   MarkAssigned.srv
+  MarkHoned.srv
   )
 
 ## Generate actions in the 'action' folder
