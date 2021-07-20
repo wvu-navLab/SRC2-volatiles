@@ -246,7 +246,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
       GetTruePose(1);
     }
 
-    if(num_vols_scout_1_ == 2)
+    if(num_vols_scout_2_ == 2)
     {
       GetTruePose(2);
     }
