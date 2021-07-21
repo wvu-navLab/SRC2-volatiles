@@ -46,7 +46,7 @@ bool VolatileMapper::markCollected_(volatile_map::MarkCollected::Request &req, v
     {
     VolatileMap_.vol[i].collected = collected;
     VolatileMap_.vol[i].attempted = attempted;
-    ROS_WARN_STREAM("VolMapper: Marking Vol" << volIndex << " Collected: " << collected << " Attempted:" << attempted );
+    ROS_WARN_STREAM("[VOLATILE MAPPER] Marking Vol" << volIndex << " Collected: " << collected << " Attempted:" << attempted );
     }
   }
 
@@ -64,7 +64,7 @@ bool VolatileMapper::markHoned_(volatile_map::MarkHoned::Request &req, volatile_
     if(volIndex == VolatileMap_.vol[i].vol_index)
     {
     VolatileMap_.vol[i].honed = honed;
-    ROS_WARN_STREAM("VolMapper: Marking Vol" << volIndex << " Honed: " << honed );
+    ROS_WARN_STREAM("[VOLATILE MAPPER] Marking Vol" << volIndex << " Honed: " << honed );
     }
   }
 
@@ -86,7 +86,7 @@ bool VolatileMapper::markAssigned_(volatile_map::MarkAssigned::Request &req, vol
     {
     VolatileMap_.vol[i].robot_id_assigned = robot_id;
 
-    ROS_WARN_STREAM("VolMapper: Marking Vol" << volIndex << " Assigned to: " << robot_id );
+    ROS_WARN_STREAM("[VOLATILE MAPPER] Marking Vol" << volIndex << ", Assigned to: " << robot_id );
     }
   }
 
@@ -99,7 +99,7 @@ bool VolatileMapper::markAssigned_(volatile_map::MarkAssigned::Request &req, vol
 
 void VolatileMapper::Publish(){
   volMapPub_.publish(VolatileMap_);
-  ROS_INFO_STREAM(" !!Volatile Mapper!! # Vols Mapped -->" << num_vols_ << " # Attemped -->" << num_attempt_ << " Collected -->" << num_collect_);
+  ROS_INFO_STREAM("[VOLATILE MAPPER] #Volatiles - Mapped: " << num_vols_ << ", Attemped: " << num_attempt_ << ", Collected: " << num_collect_);
 }
 
 void VolatileMapper::GetTruePose(int scout_id)
@@ -113,12 +113,12 @@ void VolatileMapper::GetTruePose(int scout_id)
   {
     if (clt_sf_true_pose_sc1.call(srv_sf_true_pose))
     {
-      ROS_INFO_STREAM("[Vol Map Scout 1] Called service TruePose");
+      ROS_INFO_STREAM("[VOLATILE MAPPER] Scout 1. Called service TruePose");
 
     }
     else
     {
-      ROS_INFO_STREAM("[Vol Map Scout 1] Failed to Call service TruePose");
+      ROS_INFO_STREAM("[VOLATILE MAPPER] Scout 1. Failed to Call service TruePose");
     }
   }
 
@@ -126,12 +126,12 @@ void VolatileMapper::GetTruePose(int scout_id)
   {
     if (clt_sf_true_pose_sc2.call(srv_sf_true_pose))
     {
-      ROS_INFO_STREAM("[Vol Map Scout 2] Called service TruePose");
+      ROS_INFO_STREAM("[VOLATILE MAPPER] Scout 2. Called service TruePose");
 
     }
     else
     {
-      ROS_INFO_STREAM("[Vol Map Scout 2] Failed to Call service TruePose");
+      ROS_INFO_STREAM("[VOLATILE MAPPER] Scout 2. Failed to Call service TruePose");
     }
   }
 
@@ -172,7 +172,7 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
 
   vol.scout_id = std::atoi(&robot_number);
   lastVolRecordedPerID_[vol.scout_id-1]=ros::Time::now();
-  std::cout << vol.type << " " << vol.distance_to << " "  << vol.scout_id << std::endl;
+  // std::cout << vol.type << " " << vol.distance_to << " "  << vol.scout_id << std::endl;
 
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tf2_listener(tfBuffer);
