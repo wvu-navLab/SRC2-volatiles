@@ -31,6 +31,8 @@ private:
   int num_vols_, num_collect_, num_attempt_ ,num_vols_scout_1_, num_vols_scout_2_;
   std::vector<ros::Subscriber> volSubs_;
   std::vector<ros::Publisher> stopScoutPub_;
+  bool flag_called_scout1_true_pose = false;
+  bool flag_called_scout2_true_pose = false;
 
   void volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs::VolSensorMsg const>& event);
   bool markCollected_(volatile_map::MarkCollected::Request &req, volatile_map::MarkCollected::Response &res);

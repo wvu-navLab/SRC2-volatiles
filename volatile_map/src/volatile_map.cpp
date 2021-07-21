@@ -111,6 +111,7 @@ void VolatileMapper::GetTruePose(int scout_id)
 
   if(scout_id == 1)
   {
+    flag_called_scout1_true_pose =true;
     if (clt_sf_true_pose_sc1.call(srv_sf_true_pose))
     {
       ROS_INFO_STREAM("[VOLATILE MAPPER] Scout 1. Called service TruePose");
@@ -124,6 +125,7 @@ void VolatileMapper::GetTruePose(int scout_id)
 
   if(scout_id == 2)
   {
+    flag_called_scout2_true_pose =true;
     if (clt_sf_true_pose_sc2.call(srv_sf_true_pose))
     {
       ROS_INFO_STREAM("[VOLATILE MAPPER] Scout 2. Called service TruePose");
@@ -241,12 +243,12 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
     {
       num_vols_scout_2_ = num_vols_scout_2_ +1;
     }
-    if(num_vols_scout_1_ == 2)
+    if(num_vols_scout_1_ == 2 && !flag_called_scout1_true_pose)
     {
       GetTruePose(1);
     }
 
-    if(num_vols_scout_2_ == 2)
+    if(num_vols_scout_2_ == 2 && !flag_called_scout2_true_pose)
     {
       GetTruePose(2);
     }
