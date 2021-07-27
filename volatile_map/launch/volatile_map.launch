@@ -1,7 +1,7 @@
 <launch>
     <rosparam command="load" file="$(find volatile_map)/config/volatile_map.yaml" subst_value="true" />
 
-    <node pkg="volatile_map" type="volatile_map" name="volatile_map" respawn="true" output="screen" launch-prefix="xterm -e gdb --args"/>
+    <node pkg="volatile_map" type="volatile_map" name="volatile_map" respawn="true" output="screen"/>
 
     <!--node pkg="task_planning" type="excavation_task_node" name="excavation_task_node" respawn="true" output="screen"/-->
 </launch>
