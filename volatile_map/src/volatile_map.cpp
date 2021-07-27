@@ -170,9 +170,20 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   vol.slow = false;
   vol.robot_id_assigned =0;
 
+  // vol.scout_id = std::atoi(&robot_number);
+  if(robot_number == '1')
+  {
+    vol.scout_id = 1;
+  }
+  else if (robot_number == '2')
+  {
+    vol.scout_id = 2;
+  }
+  else
+  {
+    return;
+  }
 
-
-  vol.scout_id = std::atoi(&robot_number);
   lastVolRecordedPerID_[vol.scout_id-1]=ros::Time::now();
   // std::cout << vol.type << " " << vol.distance_to << " "  << vol.scout_id << std::endl;
 
@@ -183,8 +194,22 @@ void VolatileMapper::volatileSensorCallBack_(const ros::MessageEvent<srcp2_msgs:
   {
     std::string odom_frame;
     std::string volSensor_frame;
-    odom_frame = "small_scout_" + std::to_string(std::atoi(&robot_number)) + "_odom";
-    volSensor_frame = "small_scout_" + std::to_string(std::atoi(&robot_number)) + "_volatile_sensor";
+    // odom_frame = "small_scout_" + std::to_string(std::atoi(&robot_number)) + "_odom";
+    // volSensor_frame = "small_scout_" + std::to_string(std::atoi(&robot_number)) + "_volatile_sensor";
+    if(robot_number == '1')
+    {
+      odom_frame = "small_scout_1_odom";
+      volSensor_frame = "small_scout_1_volatile_sensor";
+    }
+    else if (robot_number == '2')
+    {
+      odom_frame = "small_scout_2_odom";
+      volSensor_frame = "small_scout_2_volatile_sensor";
+    }
+    else
+    {
+      return;
+    }
     T_s2o = tfBuffer.lookupTransform(odom_frame, volSensor_frame,
                                      ros::Time(0), ros::Duration(1.0));
     geometry_msgs::PointStamped current_position;
